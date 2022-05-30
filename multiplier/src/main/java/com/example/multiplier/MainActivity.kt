@@ -17,7 +17,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val px = applicationContext.resources.displayMetrics.density
         setContent {
-            var itemsList by remember { mutableStateOf(items) }
+            val itemsList=items.shuffled()
             ComposeExamplesTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     GameScreen(itemsList, px)

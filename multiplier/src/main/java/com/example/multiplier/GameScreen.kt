@@ -1,13 +1,11 @@
 package com.example.multiplier
 
-import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -126,13 +124,15 @@ fun GridItem(
 
         //animate gift image visibility
             Image(
-                modifier = modifier.scale(imageScale).alpha(imgAlpha),
+                modifier = modifier
+                    .scale(imageScale)
+                    .alpha(imgAlpha),
                 imageVector = image,
                 contentDescription = null
             )
 
         //show only winCoefs
-        AnimatedVisibility(visible = isWinAnimation, enter = fadeIn(animationSpec = tween(durationMillis = 1000))) {
+        AnimatedVisibility(visible = isWinAnimation, enter = fadeIn(animationSpec = tween(durationMillis = 300))) {
             Column(modifier = modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = item.winValue,
@@ -153,7 +153,7 @@ fun WinView(
 ) {
     val configuration = LocalConfiguration.current
     val centerX = configuration.screenWidthDp / 2
-    val centerY = configuration.screenHeightDp / 2
+    val centerY = (configuration.screenHeightDp - 64) / 2
 
     val startX = positionText.x.div(dip)
     val startY = positionText.y.div(dip)
