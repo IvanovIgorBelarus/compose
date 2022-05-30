@@ -1,5 +1,6 @@
 package com.example.multiplier
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
@@ -87,11 +88,12 @@ fun GridItem(
 ) {
     val image = ImageVector.vectorResource(id = R.drawable.ic_icon_gift)
 
-    var isItemOpen by remember { mutableStateOf(item.isOpen) }
+    var isItemOpen by remember { mutableStateOf(isWinAnimation) }
     var positionText by remember { mutableStateOf(Offset.Zero) } // save win item position
 
-    val alpha by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 3000))//for text anim
-    val imageScale by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 500))//for image anim
+    val textAlpha by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 3000))//for text anim
+    val imageScale by animateFloatAsState( targetValue = if (isWinAnimation || isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 500))//for image anim
+    val imgAlpha by animateFloatAsState( targetValue = if (isWinAnimation || isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 500))//for image anim
 
     Box(
         modifier = modifier
@@ -114,7 +116,7 @@ fun GridItem(
                     textAlign = TextAlign.Center,
                     color = Dark_blue,
                     modifier = Modifier
-                        .alpha(alpha)
+                        .alpha(textAlpha)
                         .onGloballyPositioned {
                             positionText = it.positionInRoot()
                         }
@@ -123,16 +125,12 @@ fun GridItem(
         }
 
         //animate gift image visibility
-        AnimatedVisibility(
-            visible = !isItemOpen && !isWinAnimation,
-            exit = fadeOut(animationSpec = tween(durationMillis = 500))
-        ) {
             Image(
-                modifier = modifier.scale(imageScale),
+                modifier = modifier.scale(imageScale).alpha(imgAlpha),
                 imageVector = image,
                 contentDescription = null
             )
-        }
+
         //show only winCoefs
         AnimatedVisibility(visible = isWinAnimation, enter = fadeIn(animationSpec = tween(durationMillis = 1000))) {
             Column(modifier = modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
