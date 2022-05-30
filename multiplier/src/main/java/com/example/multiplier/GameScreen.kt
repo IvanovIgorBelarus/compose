@@ -1,8 +1,10 @@
 package com.example.multiplier
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -28,73 +30,50 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.multiplier.data.GameItem
 import com.example.multiplier.ui.theme.Dark_blue
+import kotlinx.coroutines.launch
 
 @Composable
 fun GameScreen(
     itemsList: List<GameItem>,
     dip: Float
 ) {
-    //get box size
-    val configuration = LocalConfiguration.current
-    val itemWidth = configuration.screenWidthDp.dp / 4
-    val itemHeight = configuration.screenHeightDp.dp / 6
-    val itemSize = if (itemHeight > itemWidth) itemWidth else itemHeight
-
     //states for result animation
     var isWinAnimation by remember { mutableStateOf(false) }
     var positionText by remember { mutableStateOf(Offset.Zero) }
     var winCoef by remember { mutableStateOf("") }
-    val winTextSize by animateFloatAsState(
-        targetValue = if (isWinAnimation) {
-            8f
-        } else {
-            1f
-        }, animationSpec = spring(stiffness = 2f)
-    )
 
-    //for position animation
-    val centerX = configuration.screenWidthDp.dp / 2
-    val centerY = configuration.screenHeightDp.dp / 2
-    val startX = (positionText.x / dip).dp
-    val startY = (positionText.y / dip).dp
-
-    val animX by animateDpAsState( targetValue = if (isWinAnimation) { centerX } else { startX }, animationSpec = spring(stiffness = 2f))
-    val animY by animateDpAsState( targetValue = if (isWinAnimation) { centerY } else { startY }, animationSpec = spring(stiffness = 2f))
-
-    //create Boxes
-    Crossfade(targetState = isWinAnimation, animationSpec = tween(durationMillis = 1000, delayMillis = 1000, easing = LinearOutSlowInEasing)) {
-        if (it) {
-            AnimatedVisibility(
-                visible = isWinAnimation,
-                enter = fadeIn(),
-                exit = fadeOut(animationSpec = spring(stiffness = 20f))
-            ) {
-                Text(
-                    text = winCoef,
-                    fontSize = 20.sp,
-                    textAlign = TextAlign.Center,
-                    color = Dark_blue,
-                    modifier = Modifier
-                        .offset(x = animX, y = animY)
-                        .scale(winTextSize)
-                )
-            }
-        } else {
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(4)
-            ) {
-                items(itemsList) { item ->
-                    GridItem(modifier = Modifier.size(itemSize), item, isWinAnimation) { position, selectedWinCoef ->
-                        isWinAnimation = true
-                        positionText = position
-                        winCoef = selectedWinCoef
-                    }
-                }
-            }
-
+    if (isWinAnimation) {
+        WinView(positionText = positionText, dip = dip, winCoef = winCoef)
+    } else {
+        GridAdapter(itemsList = itemsList, isWinAnimation = isWinAnimation) { position, selectedWinCoef ->
+            isWinAnimation = true
+            positionText = position
+            winCoef = selectedWinCoef
         }
     }
+}
 
+@Composable
+fun GridAdapter(
+    itemsList: List<GameItem>,
+    isWinAnimation: Boolean,
+    winItemClickListener: (Offset, String) -> Unit
+) {
+    val configuration = LocalConfiguration.current
+    //calculate item size
+    val itemWidth = configuration.screenWidthDp.dp / 4
+    val itemHeight = configuration.screenHeightDp.dp / 6
+    val itemSize = if (itemHeight > itemWidth) itemWidth else itemHeight
+
+    LazyVerticalGrid(
+        columns = GridCells.Fixed(4)
+    ) {
+        items(itemsList) { item ->
+            GridItem(modifier = Modifier.size(itemSize), item, isWinAnimation) { position, selectedWinCoef ->
+                winItemClickListener(position, selectedWinCoef)
+            }
+        }
+    }
 }
 
 @Composable
@@ -166,7 +145,42 @@ fun GridItem(
             }
         }
     }
+}
 
+@Composable
+fun WinView(
+    positionText: Offset,
+    dip: Float,
+    winCoef: String
+) {
+    val configuration = LocalConfiguration.current
+    val centerX = configuration.screenWidthDp / 2
+    val centerY = configuration.screenHeightDp / 2
+
+    val startX = positionText.x.div(dip)
+    val startY = positionText.y.div(dip)
+
+    val winTextSize = remember { Animatable(1f) }
+
+    val x = remember { Animatable(startX) }
+    val y = remember { Animatable(startY) }
+
+    LaunchedEffect(x, y) {
+        launch { x.animateTo(centerX.toFloat(), animationSpec = tween(1000)) }
+        launch { y.animateTo(centerY.toFloat(), animationSpec = tween(1000)) }
+        launch { winTextSize.animateTo(8f, animationSpec = tween(1000)) }
+    }
+    Column {
+        Text(
+            text = winCoef,
+            fontSize = 20.sp,
+            textAlign = TextAlign.Center,
+            color = Dark_blue,
+            modifier = Modifier
+                .offset(x.value.dp, y.value.dp)
+                .scale(winTextSize.value)
+        )
+    }
 }
 
 val items = listOf(
