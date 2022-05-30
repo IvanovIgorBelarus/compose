@@ -10,6 +10,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.multiplier.data.ItemList
 import com.example.multiplier.ui.theme.ComposeExamplesTheme
 
 class MainActivity : ComponentActivity() {
@@ -17,7 +18,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val px = applicationContext.resources.displayMetrics.density
         setContent {
-            val itemsList=items.shuffled()
+            val itemsList = ItemList.getItems().shuffled()
             ComposeExamplesTheme {
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colors.background) {
                     GameScreen(itemsList, px)
