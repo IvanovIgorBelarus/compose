@@ -8,7 +8,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -19,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -30,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.multiplier.data.GameItem
+import com.example.multiplier.extantions.noRippleClickable
 import com.example.multiplier.ui.theme.Dark_blue
 import kotlinx.coroutines.launch
 
@@ -43,7 +42,7 @@ fun GameScreen(
     var positionText by remember { mutableStateOf(Offset.Zero) }  // position of win item
     var winCoef by remember { mutableStateOf("") }
 
-    Crossfade(targetState = isWinAnimation, animationSpec = tween(durationMillis = 100, delayMillis = 1500)) {
+    Crossfade(targetState = isWinAnimation, animationSpec = tween(durationMillis = 10, delayMillis = 1500)) {
         if (it) {
             WinView(positionText = positionText, dip = dip, winCoef = winCoef)
         } else {
@@ -54,7 +53,6 @@ fun GameScreen(
             }
         }
     }
-
 }
 
 @Composable
@@ -92,19 +90,19 @@ fun GridItem(
     var isItemOpen by remember { mutableStateOf(item.isOpen) }
     var positionText by remember { mutableStateOf(Offset.Zero) } // save win item position
 
-    val alpha by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 3000))//for text
-    val imageScale by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 500))//for text
+    val alpha by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 3000))//for text anim
+    val imageScale by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 500))//for image anim
 
     Box(
         modifier = modifier
-            .clickable {
+            .noRippleClickable {
                 isItemOpen = true
                 if (item.isWinItem) onWinItemClick(positionText, item.winValue)
             }
             .padding(2.dp)
     ) {
         //start text
-        if (!isWinAnimation){
+        if (!isWinAnimation) {
             Column(modifier = modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = if (item.isWinItem) {
@@ -121,7 +119,8 @@ fun GridItem(
                             positionText = it.positionInRoot()
                         }
                 )
-            }}
+            }
+        }
 
         //animate gift image visibility
         AnimatedVisibility(
