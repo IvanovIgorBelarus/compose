@@ -4,7 +4,6 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -20,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -43,7 +43,7 @@ fun GameScreen(
     var positionText by remember { mutableStateOf(Offset.Zero) }  // position of win item
     var winCoef by remember { mutableStateOf("") }
 
-    Crossfade(targetState = isWinAnimation, animationSpec = tween(durationMillis = 800, delayMillis = 1000)) {
+    Crossfade(targetState = isWinAnimation, animationSpec = tween(durationMillis = 100, delayMillis = 1500)) {
         if (it) {
             WinView(positionText = positionText, dip = dip, winCoef = winCoef)
         } else {
@@ -87,17 +87,14 @@ fun GridItem(
     isWinAnimation: Boolean,
     onWinItemClick: (Offset, String) -> Unit
 ) {
-    var isItemOpen by remember { mutableStateOf(item.isOpen) }
     val image = ImageVector.vectorResource(id = R.drawable.ic_icon_gift)
-    val alpha by animateFloatAsState(
-        targetValue = if (isItemOpen) {
-            0f
-        } else {
-            1f
-        }, animationSpec = spring(stiffness = 2f)
-    )
 
-    var positionText by remember { mutableStateOf(Offset.Zero) }
+    var isItemOpen by remember { mutableStateOf(item.isOpen) }
+    var positionText by remember { mutableStateOf(Offset.Zero) } // save win item position
+
+    val alpha by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 3000))//for text
+    val imageScale by animateFloatAsState( targetValue = if (isItemOpen) { 0f } else { 1f }, animationSpec = tween(durationMillis = 500))//for text
+
     Box(
         modifier = modifier
             .clickable {
@@ -107,7 +104,7 @@ fun GridItem(
             .padding(2.dp)
     ) {
         //start text
-        AnimatedVisibility(visible = !isWinAnimation, exit = fadeOut(tween(durationMillis = 1000))) {
+        if (!isWinAnimation){
             Column(modifier = modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = if (item.isWinItem) {
@@ -124,15 +121,15 @@ fun GridItem(
                             positionText = it.positionInRoot()
                         }
                 )
-            }
-        }
+            }}
+
         //animate gift image visibility
         AnimatedVisibility(
             visible = !isItemOpen && !isWinAnimation,
-            exit = fadeOut(animationSpec = tween(durationMillis = 1000))
+            exit = fadeOut(animationSpec = tween(durationMillis = 500))
         ) {
             Image(
-                modifier = modifier,
+                modifier = modifier.scale(imageScale),
                 imageVector = image,
                 contentDescription = null
             )
