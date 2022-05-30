@@ -1,6 +1,7 @@
 package com.example.multiplier
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
@@ -39,18 +40,21 @@ fun GameScreen(
 ) {
     //states for result animation
     var isWinAnimation by remember { mutableStateOf(false) }
-    var positionText by remember { mutableStateOf(Offset.Zero) }
+    var positionText by remember { mutableStateOf(Offset.Zero) }  // position of win item
     var winCoef by remember { mutableStateOf("") }
 
-    if (isWinAnimation) {
-        WinView(positionText = positionText, dip = dip, winCoef = winCoef)
-    } else {
-        GridAdapter(itemsList = itemsList, isWinAnimation = isWinAnimation) { position, selectedWinCoef ->
-            isWinAnimation = true
-            positionText = position
-            winCoef = selectedWinCoef
+    Crossfade(targetState = isWinAnimation, animationSpec = tween(durationMillis = 800, delayMillis = 1000)) {
+        if (it) {
+            WinView(positionText = positionText, dip = dip, winCoef = winCoef)
+        } else {
+            GridAdapter(itemsList = itemsList, isWinAnimation = isWinAnimation) { position, selectedWinCoef ->
+                isWinAnimation = true
+                positionText = position
+                winCoef = selectedWinCoef
+            }
         }
     }
+
 }
 
 @Composable
@@ -103,7 +107,7 @@ fun GridItem(
             .padding(2.dp)
     ) {
         //start text
-        AnimatedVisibility(visible = !isWinAnimation, exit = fadeOut()) {
+        AnimatedVisibility(visible = !isWinAnimation, exit = fadeOut(tween(durationMillis = 1000))) {
             Column(modifier = modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = if (item.isWinItem) {
@@ -125,7 +129,7 @@ fun GridItem(
         //animate gift image visibility
         AnimatedVisibility(
             visible = !isItemOpen && !isWinAnimation,
-            exit = fadeOut(animationSpec = spring(stiffness = 20f))
+            exit = fadeOut(animationSpec = tween(durationMillis = 1000))
         ) {
             Image(
                 modifier = modifier,
@@ -134,7 +138,7 @@ fun GridItem(
             )
         }
         //show only winCoefs
-        AnimatedVisibility(visible = isWinAnimation, enter = fadeIn(animationSpec = spring(stiffness = 20f))) {
+        AnimatedVisibility(visible = isWinAnimation, enter = fadeIn(animationSpec = tween(durationMillis = 1000))) {
             Column(modifier = modifier, verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = item.winValue,
@@ -166,9 +170,9 @@ fun WinView(
     val y = remember { Animatable(startY) }
 
     LaunchedEffect(x, y) {
-        launch { x.animateTo(centerX.toFloat(), animationSpec = tween(1000)) }
-        launch { y.animateTo(centerY.toFloat(), animationSpec = tween(1000)) }
-        launch { winTextSize.animateTo(8f, animationSpec = tween(1000)) }
+        launch { x.animateTo(centerX.toFloat(), animationSpec = tween(durationMillis = 1500, delayMillis = 1500)) }
+        launch { y.animateTo(centerY.toFloat(), animationSpec = tween(durationMillis = 1500, delayMillis = 1500)) }
+        launch { winTextSize.animateTo(8f, animationSpec = tween(durationMillis = 1500, delayMillis = 1500)) }
     }
     Column {
         Text(
