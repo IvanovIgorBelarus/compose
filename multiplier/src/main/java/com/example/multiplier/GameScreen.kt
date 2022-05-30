@@ -154,7 +154,7 @@ fun WinView(
     //calculate window center
     val configuration = LocalConfiguration.current
     val centerX = configuration.screenWidthDp / 2
-    val centerY = (configuration.screenHeightDp - 64) / 2
+    val centerY = configuration.screenHeightDp / 2
     //start x and y for winCoef animation
     val startX = positionText.x.div(dip)
     val startY = positionText.y.div(dip)
