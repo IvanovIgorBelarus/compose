@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "ComposeExamples"
 include ':app'
 include ':multiplier'
+include ':circlediagram'
