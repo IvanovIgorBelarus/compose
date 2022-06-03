@@ -6,5 +6,6 @@ data class DrawItem(
     var radius: Float = 300f,
     val startAngle: Float,
     val sweepAngle: Float,
+    val value: Double,
     val color: Color
 )
