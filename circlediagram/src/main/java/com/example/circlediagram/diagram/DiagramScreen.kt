@@ -26,7 +26,7 @@ import androidx.core.graphics.red
 import com.example.circlediagram.data.Data
 import com.example.circlediagram.data.DrawItem
 import com.example.circlediagram.data.OverviewItem
-import com.example.circlediagram.ui.theme.Purple500
+import com.example.circlediagram.ui.theme.TextUnderLineColor
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
@@ -139,8 +139,8 @@ private fun DrawArc(
 //            )
 
             drawLine(
-                color = Purple500,
-                strokeWidth = 4f,
+                color = TextUnderLineColor,
+                strokeWidth = 2f,
                 start = Offset(x = x, y = y),
                 end = endLineOffset
             )
@@ -155,10 +155,10 @@ private fun drawOverviews(
 ) {
     list.forEach { overview ->
         val colorX = android.graphics.Color.argb(
-            Purple500.toArgb().alpha,
-            Purple500.toArgb().red,
-            Purple500.toArgb().green,
-            Purple500.toArgb().blue
+            overview.color.toArgb().alpha,
+            overview.color.toArgb().red,
+            overview.color.toArgb().green,
+            overview.color.toArgb().blue
         )
         val paint = Paint().apply {
             textAlign = Paint.Align.CENTER

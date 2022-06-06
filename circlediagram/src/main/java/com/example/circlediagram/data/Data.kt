@@ -7,6 +7,6 @@ object Data {
 
     fun getData() = listOf(110, 80, 120, 100, 90, 50, 40, 60)
 
-    fun getColors() = listOf(Blue, Red, Mint, Purple2, DarkBlue, Orange, DarkGray, Green)
+    fun getColors() = listOf(Blue, Red, Mint, Purple2, DarkBlue, Orange, DarkMintColor, Green)
 
 }
